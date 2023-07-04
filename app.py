@@ -4,13 +4,11 @@ from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
 
-print(app.config)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://renovations_app_dev:codernewapp2023@localhost:5432/renovation_materials'
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
-print(db.__dict__)
+
 
 class User(db.Model):
   __tablename__ = 'users'
@@ -20,54 +18,52 @@ class User(db.Model):
   last_name = db.Column(db.String(30))
   email = db.Column(db.String, nullable=False, unique=True)
   password = db.Column(db.String, nullable=False)
-  phone_number = db.Column(db.Integer)
   is_shop_owner = db.Column(db.Boolean, default=False)
   
 class UserSchema(ma.Schema):
   class Meta:
     # listing the fields we want to include 
-    fields = ('id','name','email')
+    fields = ('name','last_name','email','is_shop_owner')
     
-class Review(db.Model):
-  __tablename__ = 'reviews'
+# class Review(db.Model):
+#   __tablename__ = 'reviews'
   
-  id = db.Column(db.Integer, primary_key=True)
-  title = db.Column(db.String(30))
-  comment = db.Column(db.Text())
-  rating = 
-  material_id
-  shop_id
-  user_id
+#   id = db.Column(db.Integer, primary_key=True)
+#   title = db.Column(db.String(30))
+#   comment = db.Column(db.Text())
+#   rating = 
+#   material_id
+#   shop_id
+#   user_id
   
-class Material(db.Model):
-  __tablename__ = 'materials'
+# class Material(db.Model):
+#   __tablename__ = 'materials'
   
-  id = 
-  name = 
-  description = 
-  price = 
-  shop_id = 
+#   id = 
+#   name = 
+#   description = 
+#   price = 
+#   shop_id = 
 
   
-class Shop(db.Model):
-  __tablename__ = 'shops'
+# class Shop(db.Model):
+#   __tablename__ = 'shops'
   
-  id = db.Column(db.Integer, primary_key=True)
-  name = db.Column(db.String(30))
-  contact_info = 
-  address_id
+#   id = db.Column(db.Integer, primary_key=True)
+#   name = db.Column(db.String(30))
+#   contact_info = 
+#   address_id
 
-class Address(db.Model):
-  __tablename__ = 'addresses'
+# class Address(db.Model):
+#   __tablename__ = 'addresses'
   
-  id = db.Column(db.Integer, primary_key=True)
-  title = db.Column(db.String(30))
-  street_number =  
-  street_name = 
-  suburb = 
-  city  = 
-  state = 
-  zip_code = 
+#   id = db.Column(db.Integer, primary_key=True)
+#   street_number =  
+#   street_name = 
+#   suburb = 
+#   city  = 
+#   state = 
+#   zip_code = 
   
 
 @app.cli.command('create')
@@ -82,7 +78,9 @@ def seed_db():
   users = [
     User(
     name = 'Celeste',
-    last_name = 'Adams'
+    last_name = 'Adams',
+    email = 'celeste@gmail.com',
+    password = 'password21'
    )
   ]
 # Truncate the User table (deleting rows of data)
