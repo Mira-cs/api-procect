@@ -1,13 +1,17 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://renovations_app_dev:codernewapp2023@localhost:5432/renovation_materials'
+app.config[
+  'SQLALCHEMY_DATABASE_URI'
+  ] = 'postgresql+psycopg2://renovations_app_dev:codernewapp2023@localhost:5432/renovation_materials'
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+bcrypt = Bcrypt(app)
 
 
 class User(db.Model):
@@ -79,8 +83,21 @@ def seed_db():
     User(
     name = 'Celeste',
     last_name = 'Adams',
-    email = 'celeste@gmail.com',
-    password = 'password21'
+    email = 'celeste_adams@gmail.com',
+    password = bcrypt.generate_password_hash('password1').decode('utf-8')
+   ), 
+    User(
+    name = 'Caroline',
+    last_name = 'Neally',
+    email = 'caroline_oneal@gmail.com',
+    password = bcrypt.generate_password_hash('password2').decode('utf-8')
+   ), 
+    User(
+    name = 'Mark',
+    last_name = 'Johnson',
+    email = 'mark_shop@gmail.com',
+    password = bcrypt.generate_password_hash('password3').decode('utf-8'),
+    is_shop_owner = True
    )
   ]
 # Truncate the User table (deleting rows of data)
