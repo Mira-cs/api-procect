@@ -1,26 +1,12 @@
-from flask import Flask, request, abort
-from sqlalchemy.exc import IntegrityError
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from datetime import timedelta
-from os import environ
-from dotenv import load_dotenv
+from flask import Blueprint
+from models.user import User
+from init import db,bcrypt
 from models.user import User, UserSchema
-from init import db, ma, bcrypt, jwt
-from blueprints.cli_bp import cli_bp
+from flask import request
+from sqlalchemy.exc import IntegrityError
 
-load_dotenv()
+auth_bp = Blueprint('auth', __name__)
 
-app = Flask(__name__)
-
-app.config['JWT_SECRET_KEY'] = environ.get('JWT_KEY')
-app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URI')
-
-db.init_app(app)
-ma.init_app(app)
-jwt.init_app(app)
-bcrypt.init_app(app)
-
-app.register_blueprint(cli_bp)
 
 @app.route('/register', methods=['POST'])
 def register(): 
@@ -65,5 +51,3 @@ def login():
     return{'error': 'Email and password are required'}, 400
   
  
-if __name__ == '__main__':
-  app.run(debug=True)
