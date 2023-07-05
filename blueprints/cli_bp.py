@@ -1,7 +1,7 @@
 from flask import Blueprint
 from models.user import User
 from init import db,bcrypt
-from blueprints.cli_bp import db_commands
+
 
 db_commands = Blueprint('db', __name__)
 
@@ -11,7 +11,7 @@ def create_db():
   db.create_all()
   print('Tables created successfully')
 
-@db_commands.command('seed')
+@db_commands.cli.command('seed')
 def seed_db():
   # Create an instance of the User model in memory
   users = [
