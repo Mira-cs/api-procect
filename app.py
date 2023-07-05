@@ -1,12 +1,11 @@
 from flask import Flask, request, abort
-from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
-from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
 from os import environ
 from dotenv import load_dotenv
+from models.user import User, UserSchema
+from init import db, ma, bcrypt, jwt
 
 load_dotenv()
 
@@ -15,26 +14,10 @@ app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = environ.get('JWT_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URI')
 
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
-bcrypt = Bcrypt(app)
-jwt = JWTManager(app)
-
-class User(db.Model):
-  __tablename__ = 'users'
-  
-  id = db.Column(db.Integer, primary_key=True)
-  name = db.Column(db.String(30))
-  last_name = db.Column(db.String(30))
-  email = db.Column(db.String, nullable=False, unique=True)
-  password = db.Column(db.String, nullable=False)
-  is_shop_owner = db.Column(db.Boolean, default=False)
-  
-class UserSchema(ma.Schema):
-  class Meta:
-    # listing the fields we want to include 
-    fields = ('name','last_name', 'email','password','is_shop_owner')
-    
+db.init_app(app)
+ma.init_app(app)
+jwt.init_app(app)
+bcrypt.init_app(app)
 
 @app.cli.command('create')
 def create_db():
