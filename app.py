@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
@@ -27,7 +27,8 @@ class User(db.Model):
 class UserSchema(ma.Schema):
   class Meta:
     # listing the fields we want to include 
-    fields = ('name','last_name','email','is_shop_owner')
+    fields = ('name','last_name', 'email','password','is_shop_owner')
+  
     
 # class Review(db.Model):
 #   __tablename__ = 'reviews'
@@ -101,7 +102,7 @@ def seed_db():
    )
   ]
 # Truncate the User table (deleting rows of data)
-  db.session.query(User).delete
+  db.session.query(User).delete()
 
 # Add the card to the session (transaction)
   db.session.add_all(users)
@@ -110,13 +111,32 @@ def seed_db():
   db.session.commit()
   print("Models seeded")
 
-@app.route('/users')
-def all_users():  
-# select * from users;
-  stmt = db.select(User).order_by(User.name)
-  users = db.session.scalars(stmt).all()
-  return UserSchema(many=True).dumps(users)
+@app.route('/register', methods=['POST'])
+def register(): 
+  # to validate and sanitize all the incoming data via Marshmallow schema
+  # Parse, sanitize and validate the incoming JSON data
+  # via schema
+  user_info = UserSchema().load(request.json)
+  # Create a new User instance with the schema data
+  user = User(
+    email=user_info['email'],
+    password=bcrypt.generate_password_hash(user_info['password']).decode('utf8'),
+    name=user_info['name'],
+    last_name=user_info['last_name']
+  )
+  # Add and commit the new user
+  db.session.add(user)
+  db.session.commit()
+  # Return the new user, excluding the password
+  return UserSchema(exclude=['password']).dump(user), 201
   
+  
+   
+# # select * from users;
+#   stmt = db.select(User).order_by(User.name)
+#   users = db.session.scalars(stmt).all()
+#   return UserSchema(many=True).dumps(users)
+ 
 
 @app.route('/')
 def index():
