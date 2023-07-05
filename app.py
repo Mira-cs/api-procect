@@ -3,8 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import JWTManager, create_access_token
+from datetime import timedelta
 
 app = Flask(__name__)
+
+app.config['JWT_SECRET_KEY'] = 'aifaposidfaidfpi'
 
 app.config[
   'SQLALCHEMY_DATABASE_URI'
@@ -13,6 +17,7 @@ app.config[
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 
 
 class User(db.Model):
@@ -29,48 +34,7 @@ class UserSchema(ma.Schema):
   class Meta:
     # listing the fields we want to include 
     fields = ('name','last_name', 'email','password','is_shop_owner')
-  
     
-# class Review(db.Model):
-#   __tablename__ = 'reviews'
-  
-#   id = db.Column(db.Integer, primary_key=True)
-#   title = db.Column(db.String(30))
-#   comment = db.Column(db.Text())
-#   rating = 
-#   material_id
-#   shop_id
-#   user_id
-  
-# class Material(db.Model):
-#   __tablename__ = 'materials'
-  
-#   id = 
-#   name = 
-#   description = 
-#   price = 
-#   shop_id = 
-
-  
-# class Shop(db.Model):
-#   __tablename__ = 'shops'
-  
-#   id = db.Column(db.Integer, primary_key=True)
-#   name = db.Column(db.String(30))
-#   contact_info = 
-#   address_id
-
-# class Address(db.Model):
-#   __tablename__ = 'addresses'
-  
-#   id = db.Column(db.Integer, primary_key=True)
-#   street_number =  
-#   street_name = 
-#   suburb = 
-#   city  = 
-#   state = 
-#   zip_code = 
-  
 
 @app.cli.command('create')
 def create_db():
@@ -146,17 +110,14 @@ def login():
     # first parameter is users password from database,
     # the second one is the one retrieved from the POST method)
     if user and bcrypt.check_password_hash(user.password, request.json['password']):
-      return UserSchema(exclude=['password']).dump(user)
+      # generating a token for the user
+      token = create_access_token(identity=user.email, expires_delta = timedelta(hours=2))
+      return {'token': token, 'user': UserSchema(exclude=['password']).dump(user)}
     else:
       return {'error': 'Invalid email address or password'}, 401
   except KeyError:
     return{'error': 'Email and password are required'}, 400
   
-
-# # select * from users;
-#   stmt = db.select(User).order_by(User.name)
-#   users = db.session.scalars(stmt).all()
-#   return UserSchema(many=True).dumps(users)
  
 if __name__ == '__main__':
   app.run(debug=True)
