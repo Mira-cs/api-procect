@@ -6,21 +6,19 @@ from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
 from os import environ
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
-app.config['JWT_SECRET_KEY'] = 'aifaposidfaidfpi'
-
-app.config[
-  'SQLALCHEMY_DATABASE_URI'
-  ] = 'postgresql+psycopg2://renovations_app_dev:codernewapp2023@localhost:5432/renovation_materials'
+app.config['JWT_SECRET_KEY'] = environ.get('JWT_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URI')
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
-
-
 
 class User(db.Model):
   __tablename__ = 'users'
