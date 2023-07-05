@@ -1,14 +1,24 @@
 from flask import Blueprint
+from flask import abort
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from models.user import User
 from init import db,bcrypt
 from models.user import User, UserSchema
 from flask import request
 from sqlalchemy.exc import IntegrityError
+from datetime import timedelta
+from flask_jwt_extended import create_access_token
 
 auth_bp = Blueprint('auth', __name__)
 
+def admin_required():
+  user_email = get_jwt_identity()
+  stmt = db.select(Modelname).filter_by(email=user_email)
+  user = db.session.scalar(stmt)
+  if not (user and user.is_shop_owner):
+    abort(401)  
 
-@app.route('/register', methods=['POST'])
+@auth_bp.route('/register', methods=['POST'])
 def register(): 
   try:
     # to validate and sanitize all the incoming data via Marshmallow schema
@@ -31,7 +41,7 @@ def register():
   except IntegrityError:
     return {'error': 'Email address already in use'}, 409
   
-@app.route('/login', methods=['POST'])
+@auth_bp.route('/login', methods=['POST'])
 def login():
   try:
     # to get the user from the database, where email equals to the email from the user data posted
