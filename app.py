@@ -6,6 +6,7 @@ from os import environ
 from dotenv import load_dotenv
 from models.user import User, UserSchema
 from init import db, ma, bcrypt, jwt
+from blueprints.cli_bp import db_commands
 
 load_dotenv()
 
@@ -19,45 +20,7 @@ ma.init_app(app)
 jwt.init_app(app)
 bcrypt.init_app(app)
 
-@app.cli.command('create')
-def create_db():
-  db.drop_all()
-  db.create_all()
-  print('Tables created successfully')
-
-@app.cli.command('seed')
-def seed_db():
-  # Create an instance of the User model in memory
-  users = [
-    User(
-    name = 'Celeste',
-    last_name = 'Adams',
-    email = 'celeste_adams@gmail.com',
-    password = bcrypt.generate_password_hash('password1').decode('utf-8')
-   ), 
-    User(
-    name = 'Caroline',
-    last_name = 'Neally',
-    email = 'caroline_oneal@gmail.com',
-    password = bcrypt.generate_password_hash('password2').decode('utf-8')
-   ), 
-    User(
-    name = 'Mark',
-    last_name = 'Johnson',
-    email = 'mark_shop@gmail.com',
-    password = bcrypt.generate_password_hash('password3').decode('utf-8'),
-    is_shop_owner = True
-   )
-  ]
-# Truncate the User table (deleting rows of data)
-  db.session.query(User).delete()
-
-# Add the card to the session (transaction)
-  db.session.add_all(users)
-  
-# Commit the transaction to the database
-  db.session.commit()
-  print("Models seeded")
+app.register_blueprint(db_commands)
 
 @app.route('/register', methods=['POST'])
 def register(): 
