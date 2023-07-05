@@ -3,6 +3,7 @@ from os import environ
 from init import db, ma, bcrypt, jwt
 from blueprints.cli_bp import cli_bp
 from blueprints.auth_bp import auth_bp
+from blueprints.materials_bp import materials_bp
 
 def create_app():
   app = Flask(__name__)
@@ -17,6 +18,7 @@ def create_app():
 
   app.register_blueprint(cli_bp)
   app.register_blueprint(auth_bp)
+  app.register_blueprint(materials_bp)
 
   @app.errorhandler(401)
   def unauthorized(err):
