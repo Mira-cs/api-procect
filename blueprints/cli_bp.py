@@ -100,7 +100,7 @@ def seed_db():
     Store(
     name = 'Everything you need',
     phone_number = '10235392',
-    owner_id = owners[1].id,
+    owner_id = owners[2].id,
     street_number = 3,
     street_name = 'Monroe Street',
     suburb = 'Madeup',
@@ -134,7 +134,7 @@ def seed_db():
     category = 'Surfaces',
     description = 'A coarse-grained intrusive igneous rock composed mostly of quartz, alkali feldspar, and plagioclase',
     price = 4000.0,
-    store_id = stores[0].id
+    store_id = stores[2].id
     )
   ]
   

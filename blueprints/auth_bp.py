@@ -99,12 +99,6 @@ def user_required():
   user = db.session.scalar(stmt)
   if not user:
     abort(401)
-    
-def get_owner_object(owner):
-  owner_id = get_jwt_identity()
-  stmt = db.select(Owner).filter_by(id=owner_id)
-  owner = db.session.scalar(stmt)
-  return owner
   
   
 # Matching the user id with the user id on the review
@@ -119,11 +113,10 @@ def owner_required_foraccess(current_id):
   owner_id = get_jwt_identity()
   stmt = db.select(Owner).filter_by(id=owner_id)
   owner = db.session.scalar(stmt)
-  stmt1 = db.select()
-  if not owner.id == current_id:
-    abort(401)
+  if owner:
+    store_ids = [store.id for store in owner.stores]
+    if current_id not in store_ids:
+        abort(401)
+  else:
+      abort(401)
 
-def is_owner_of_store(store_id):
-    owner_id = get_jwt_identity()
-    owner = Owner.query.get(owner_id)
-    return any(store.id == store_id for store in owner.stores)

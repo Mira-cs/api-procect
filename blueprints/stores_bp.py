@@ -72,7 +72,7 @@ def update_store(store_id):
   else:
     return {'error': 'Store not found'}, 404
   
-  # delete a store
+# delete a store
 @stores_bp.route('/<int:store_id>', methods=['DELETE'])
 @jwt_required()
 def delete_store(store_id):

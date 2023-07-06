@@ -1,7 +1,7 @@
 from flask import Blueprint, request, abort
 from models.material import Material, MaterialSchema
 from models.store import Store, StoreSchema
-from blueprints.auth_bp import owner_required,get_owner_object,is_owner_of_store
+from blueprints.auth_bp import owner_required, owner_required_foraccess
 from init import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -57,15 +57,16 @@ def create_material():
 def update_material(material_id):
   owner_required()
   stmt = db.select(Material).filter_by(id=material_id)
-  material = db.session.scalar(stmt)
-  material_info = MaterialSchema().load(request.json)
-  if material and is_owner_of_store(material.store_id):
-    material.name = material_info.get('name', material.name)
-    material.category = material_info.get('category', material.category)
-    material.description = material_info.get('description', material.description)
-    material.price = material_info.get('price', material.price)
+  material_object = db.session.scalar(stmt)
+  material_new = MaterialSchema().load(request.json)
+  if material_object:
+    owner_required_foraccess(material_object.store_id)
+    material_object.name = material_new.get('name', material_object.name)
+    material_object.category = material_new.get('category', material_object.category)
+    material_object.description = material_new.get('description', material_object.description)
+    material_object.price = material_new.get('price', material_object.price)
     db.session.commit()
-    return MaterialSchema().dump(material), 201
+    return MaterialSchema().dump(material_new), 201
   else:
     return {'error': 'Material not found'}, 404
 
@@ -75,7 +76,8 @@ def delete_material(material_id):
   owner_required()
   stmt = db.select(Material).filter_by(id=material_id)
   material = db.session.scalar(stmt)
-  if material and is_owner_of_store(material.store_id):
+  if material:
+    owner_required_foraccess(material.store_id)
     db.session.delete(material)
     db.session.commit()
     return {'Message': 'Material was successfully deleted'}, 200
