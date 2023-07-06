@@ -18,4 +18,4 @@ class Review(db.Model):
 class ReviewSchema(ma.Schema):
   class Meta:
     # listing the fields we want to include 
-    fields = ('title','comment', 'rating', 'user', 'store_id', 'material_id')
+    fields = ('id','title','comment','rating','user_id','store_id', 'material_id')

@@ -7,10 +7,19 @@ from flask_jwt_extended import jwt_required
 
 reviews_bp = Blueprint('reviews', __name__, url_prefix='/reviews')
 
+# get a list of all the reviews created by the user
+@reviews_bp.route('/', methods=['GET'])
+@jwt_required()
+def all_reviews_by_user():
+  user_id = get_jwt_identity()
+  stmt = db.select(Review).filter_by(id=user_id)
+  reviews = db.session.scalars(stmt).all()
+  return ReviewSchema(many=True).dump(reviews)
+
 # Create a review
 @reviews_bp.route('/', methods=['POST'])
 @jwt_required()
-def create_card():
+def create_review():
   user_required()
   # Load the incoming POST data via the schema
   review_info = ReviewSchema().load(request.json)
@@ -58,4 +67,4 @@ def delete_review(review_id):
     db.session.commit()
     return {}, 200
   else:
-    return {'error': 'Card not found'}, 404
+    return {'error': 'Review not found'}, 404

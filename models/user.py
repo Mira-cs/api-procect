@@ -1,4 +1,5 @@
 from init import db, ma
+from marshmallow import fields
 
 class User(db.Model):
   __tablename__ = 'users'
@@ -8,6 +9,7 @@ class User(db.Model):
   last_name = db.Column(db.String(30))
   email = db.Column(db.String, nullable=False, unique=True)
   password = db.Column(db.String, nullable=False)
+  
   
   reviews = db.relationship('Review', back_populates='user')
   
