@@ -9,6 +9,7 @@ class Material(db.Model):
   description = db.Column(db.Text)
   price = db.Column(db.Numeric, nullable=False)
   
+  
 class MaterialSchema(ma.Schema):
   class Meta:
     # listing the fields we want to include 

@@ -35,7 +35,7 @@ def seed_db():
     last_name = 'Johnson',
     email = 'mark_shop@gmail.com',
     password = bcrypt.generate_password_hash('password3').decode('utf-8'),
-    is_shop_owner = True
+    is_store_owner = True
     )
   ]
   
