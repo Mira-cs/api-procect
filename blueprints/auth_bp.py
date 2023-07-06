@@ -4,6 +4,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from init import db,bcrypt
 from models.user import User, UserSchema
 from models.owner import Owner, OwnerSchema
+from models.store import Store, StoreSchema
 from flask import request
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta
@@ -99,7 +100,13 @@ def user_required():
   if not user:
     abort(401)
     
-
+def get_owner_object(owner):
+  owner_id = get_jwt_identity()
+  stmt = db.select(Owner).filter_by(id=owner_id)
+  owner = db.session.scalar(stmt)
+  return owner
+  
+  
 # Matching the user id with the user id on the review
 def author_required(author_id):
   user_id = get_jwt_identity()
@@ -112,5 +119,11 @@ def owner_required_foraccess(current_id):
   owner_id = get_jwt_identity()
   stmt = db.select(Owner).filter_by(id=owner_id)
   owner = db.session.scalar(stmt)
+  stmt1 = db.select()
   if not owner.id == current_id:
     abort(401)
+
+def is_owner_of_store(store_id):
+    owner_id = get_jwt_identity()
+    owner = Owner.query.get(owner_id)
+    return any(store.id == store_id for store in owner.stores)

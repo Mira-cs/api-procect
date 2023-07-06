@@ -23,4 +23,4 @@ class Store(db.Model):
 class StoreSchema(ma.Schema):
   class Meta:
     # listing the fields we want to include 
-    fields = ('name','suburb', 'city', 'state','id')
+    fields = ('name','suburb', 'city', 'state','id','zip_code','street_name', 'street_number','phone_number')

@@ -1,8 +1,9 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, abort
 from models.material import Material, MaterialSchema
-from blueprints.auth_bp import owner_required
+from models.store import Store, StoreSchema
+from blueprints.auth_bp import owner_required,get_owner_object,is_owner_of_store
 from init import db
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 
@@ -50,4 +51,33 @@ def create_material():
   # Send the new card back to the client
   return MaterialSchema().dump(material), 201
 
+# update a material
+@materials_bp.route('/<int:material_id>', methods=['PUT','PATCH'])
+@jwt_required()
+def update_material(material_id):
+  owner_required()
+  stmt = db.select(Material).filter_by(id=material_id)
+  material = db.session.scalar(stmt)
+  material_info = MaterialSchema().load(request.json)
+  if material and is_owner_of_store(material.store_id):
+    material.name = material_info.get('name', material.name)
+    material.category = material_info.get('category', material.category)
+    material.description = material_info.get('description', material.description)
+    material.price = material_info.get('price', material.price)
+    db.session.commit()
+    return MaterialSchema().dump(material), 201
+  else:
+    return {'error': 'Material not found'}, 404
 
+@materials_bp.route('/<int:material_id>', methods=['DELETE'])
+@jwt_required()
+def delete_material(material_id):
+  owner_required()
+  stmt = db.select(Material).filter_by(id=material_id)
+  material = db.session.scalar(stmt)
+  if material and is_owner_of_store(material.store_id):
+    db.session.delete(material)
+    db.session.commit()
+    return {'Message': 'Material was successfully deleted'}, 200
+  else:
+    return {'error': 'Store not found'}, 404

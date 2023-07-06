@@ -93,8 +93,8 @@ def seed_db():
     street_number = 9,
     street_name = 'Grand Street',
     suburb = 'Roscoe',
-    city = 'Sydney',
-    state = 'New South Wales',
+    city = 'Perth',
+    state = 'Western Australia',
     zip_code = 2023
     ),
     Store(
@@ -103,9 +103,9 @@ def seed_db():
     owner_id = owners[1].id,
     street_number = 3,
     street_name = 'Monroe Street',
-    suburb = 'Lidcombe',
-    city = 'Sydney',
-    state = 'New South Wales',
+    suburb = 'Madeup',
+    city = 'Canberra',
+    state = 'ACT',
     zip_code = 2121
     )
   ]
