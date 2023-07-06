@@ -36,7 +36,7 @@ def seed_db():
     name = 'Mark',
     last_name = 'Johnson',
     email = 'mark_johnson@gmail.com',
-    password = bcrypt.generate_password_hash('password3').decode('utf-8'),
+    password = bcrypt.generate_password_hash('password3').decode('utf-8')
     )
   ]
 
@@ -64,7 +64,7 @@ def seed_db():
     name = 'Mark',
     last_name = 'Johnson',
     email = 'mark_johnson@gmail.com',
-    password = bcrypt.generate_password_hash('password6').decode('utf-8'),
+    password = bcrypt.generate_password_hash('password6').decode('utf-8')
     )
   ]
   
@@ -78,15 +78,18 @@ def seed_db():
   stores = [
     Store(
     name = 'Home Depot',
-    phone_number = '91238410'
+    phone_number = '91238410',
+    owner_id = owners[0].id
     ),
     Store(
     name = 'Supplies Inc',
-    phone_number = '54098123'
+    phone_number = '54098123',
+    owner_id = owners[1].id
     ),
     Store(
     name = 'Everything you need',
-    phone_number = '10235392'
+    phone_number = '10235392',
+    owner_id = owners[1].id
     )
   ]
   

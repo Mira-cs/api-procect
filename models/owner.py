@@ -13,4 +13,4 @@ class Owner(db.Model):
 class OwnerSchema(ma.Schema):
   class Meta:
     # listing the fields we want to include 
-    fields = ('name','last_name', 'email')
+    fields = ('name','last_name', 'email','password')

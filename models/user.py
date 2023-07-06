@@ -9,6 +9,8 @@ class User(db.Model):
   email = db.Column(db.String, nullable=False, unique=True)
   password = db.Column(db.String, nullable=False)
   
+  reviews = db.relationship('Review', back_populates='user')
+  
 class UserSchema(ma.Schema):
   class Meta:
     # listing the fields we want to include 

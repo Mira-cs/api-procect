@@ -19,7 +19,7 @@ def create_card():
     title = review_info['title'],
     comment = review_info['comment'],
     rating = review_info['rating'],
-    user_id = review_info['user_id'],
+    user_id = get_jwt_identity(),
     store_id = review_info['store_id'],
     material_id = review_info['material_id']
   )
@@ -46,7 +46,7 @@ def update_review(review_id):
   else:
     return {'error': 'Review not found'}, 404
   
-  # Delete a review
+# Delete a review
 @reviews_bp.route('/<int:review_id>', methods=['DELETE'])
 @jwt_required()
 def delete_review(review_id):

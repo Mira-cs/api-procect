@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from models.material import Material, MaterialSchema
-from blueprints.auth_bp import user_required
+from blueprints.auth_bp import owner_required
 from models.user import User, UserSchema
 from init import db
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -30,25 +30,25 @@ def material_one(material_name):
   else:
     return {'error': 'Material not found'}, 404
   
-# # Add a new material
-# @materials_bp.route('/', methods=['POST'])
-# @jwt_required()
-# def create_card():
-#   admin_required()
-#   # Load the incoming POST data via the schema
-#   material_info = MaterialSchema().load(request.json)
-#   # Create a new Card instance from the card_info
-#   material = Material(
-#     name = material_info['name'],
-#     category = material_info['category'],
-#     description = material_info['description'],
-#     price = material_info['price'],
-#     owner_id = get_jwt_identity()
-#   )
-#   # Add and commit the new card to the session
-#   db.session.add(material)
-#   db.session.commit()
-#   # Send the new card back to the client
-#   return MaterialSchema().dump(material), 201
+# Add a new material
+@materials_bp.route('/', methods=['POST'])
+@jwt_required()
+def create_card():
+  owner_required()
+  # Load the incoming POST data via the schema
+  material_info = MaterialSchema().load(request.json)
+  # Create a new Card instance from the card_info
+  material = Material(
+    name = material_info['name'],
+    category = material_info['category'],
+    description = material_info['description'],
+    price = material_info['price'],
+    owner_id = get_jwt_identity()
+  )
+  # Add and commit the new card to the session
+  db.session.add(material)
+  db.session.commit()
+  # Send the new card back to the client
+  return MaterialSchema().dump(material), 201
 
 

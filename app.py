@@ -5,6 +5,7 @@ from blueprints.cli_bp import cli_bp
 from blueprints.auth_bp import auth_bp
 from blueprints.materials_bp import materials_bp
 from blueprints.reviews_bp import reviews_bp
+from blueprints.stores_bp import stores_bp
 
 def create_app():
   app = Flask(__name__)
@@ -21,6 +22,7 @@ def create_app():
   app.register_blueprint(auth_bp)
   app.register_blueprint(materials_bp)
   app.register_blueprint(reviews_bp)
+  app.register_blueprint(stores_bp)
 
   @app.errorhandler(401)
   def unauthorized(err):

@@ -1,11 +1,9 @@
 from flask import Blueprint
 from flask import abort
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from models.user import User
 from init import db,bcrypt
 from models.user import User, UserSchema
 from models.owner import Owner, OwnerSchema
-from models.review import Review, ReviewSchema
 from flask import request
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta
@@ -48,7 +46,7 @@ def users_login():
     # the second one is the one retrieved from the POST method)
     if user and bcrypt.check_password_hash(user.password, request.json['password']):
       # generating a token for the user
-      token = create_access_token(identity=user.email, expires_delta = timedelta(hours=2))
+      token = create_access_token(identity=user.id, expires_delta = timedelta(hours=2))
       return {'token': token, 'user': UserSchema(exclude=['password']).dump(user)}
     else:
       return {'error': 'Invalid email address or password'}, 401
@@ -79,7 +77,7 @@ def owners_login():
     stmt = db.select(Owner).filter_by(email=request.json['email'])
     owner = db.session.scalar(stmt)
     if owner and bcrypt.check_password_hash(owner.password, request.json['password']):
-      token = create_access_token(identity=owner.email, expires_delta = timedelta(hours=2))
+      token = create_access_token(identity=owner.id, expires_delta = timedelta(hours=2))
       return {'token': token, 'owner': OwnerSchema(exclude=['password']).dump(owner)}
     else:
       return {'error': 'Invalid email address or password'}, 401
@@ -87,18 +85,32 @@ def owners_login():
     return{'error': 'Email and password are required'}, 400
   
 
+def owner_required():
+  owner_id = get_jwt_identity()
+  stmt = db.select(Owner).filter_by(id=owner_id)
+  owner = db.session.scalar(stmt)
+  if not owner:
+    abort(401)
+
 def user_required():
   user_id = get_jwt_identity()
   stmt = db.select(User).filter_by(id=user_id)
   user = db.session.scalar(stmt)
   if not user:
-    abort(401, description = 'You must be authorized to access')
+    abort(401)
     
 
 # Matching the user id with the user id on the review
 def author_required(author_id):
-  user_email = get_jwt_identity()
-  stmt = db.select(User).filter_by(email=user_email)
+  user_id = get_jwt_identity()
+  stmt = db.select(User).filter_by(id=user_id)
   user = db.session.scalar(stmt)
   if not user.id == author_id:
+    abort(401)
+    
+def owner_required_foraccess(current_id):
+  owner_id = get_jwt_identity()
+  stmt = db.select(Owner).filter_by(id=owner_id)
+  owner = db.session.scalar(stmt)
+  if not owner.id == current_id:
     abort(401)

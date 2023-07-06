@@ -11,10 +11,11 @@ class Review(db.Model):
   # this table is linked to users table via FK user_id, nullable=false,
   # because a review can't be created without a user
   user_id = db.Column(db.Integer, db.ForeignKey('users.id',ondelete='CASCADE'), nullable=False)
+  user = db.relationship('User', back_populates='reviews')
   store_id = db.Column(db.Integer, db.ForeignKey('stores.id'), nullable=False)
   material_id = db.Column(db.Integer, db.ForeignKey('materials.id'), nullable=False)
   
 class ReviewSchema(ma.Schema):
   class Meta:
     # listing the fields we want to include 
-    fields = ('title','comment', 'rating', 'user_id', 'store_id', 'material_id')
+    fields = ('title','comment', 'rating', 'user', 'store_id', 'material_id')
