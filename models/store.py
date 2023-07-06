@@ -21,6 +21,14 @@ class Store(db.Model):
   reviews = db.relationship('Review', back_populates='store',cascade='all, delete')
 
 class StoreSchema(ma.Schema):
+  name = db.Column(db.String(30), nullable=False)
+  phone_number = db.Column(db.String(30), nullable=False)  
+  street_number = db.Column(db.Integer, nullable=False)
+  street_name = db.Column(db.String(30), nullable=False) 
+  suburb = db.Column(db.String(30), nullable=False)
+  city = db.Column(db.String(30), nullable=False)
+  state = db.Column(db.String(30), nullable=False)
+  zip_code = db.Column(db.Integer, nullable=False)
   class Meta:
     # listing the fields we want to include 
     fields = ('name','suburb', 'city', 'state','id','zip_code','street_name', 'street_number','phone_number')

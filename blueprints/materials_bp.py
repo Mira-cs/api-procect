@@ -51,15 +51,16 @@ def create_material():
   # Load the incoming POST data via the schema
   material_info = MaterialSchema().load(request.json)
   material = Material(
-    name = material_info['name'],
-    category = material_info['category'],
-    description = material_info['description'],
-    price = material_info['price'],
-    store_id = material_info['store_id']
+  name = material_info['name'],
+  category = material_info['category'],
+  description = material_info['description'],
+  price = material_info['price'],
+  store_id = material_info['store_id']
   )
   db.session.add(material)
   db.session.commit()
   return MaterialSchema().dump(material), 201
+
 
 # update a material
 @materials_bp.route('/<int:material_id>', methods=['PUT','PATCH'])
@@ -92,4 +93,4 @@ def delete_material(material_id):
     db.session.commit()
     return {'Message': 'Material was successfully deleted'}, 200
   else:
-    return {'error': 'Store not found'}, 404
+    return {'error': 'Material not found'}, 404
