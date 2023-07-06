@@ -10,6 +10,8 @@ class Owner(db.Model):
   password = db.Column(db.String, nullable=False)
   contact_number = db.Column(db.Integer)
   
+  stores = db.Relationship('Store', back_populates='owner')
+  
 class OwnerSchema(ma.Schema):
   class Meta:
     # listing the fields we want to include 

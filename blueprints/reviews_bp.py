@@ -11,9 +11,12 @@ reviews_bp = Blueprint('reviews', __name__, url_prefix='/reviews')
 @reviews_bp.route('/', methods=['GET'])
 @jwt_required()
 def all_reviews_by_user():
+  # get users id
   user_id = get_jwt_identity()
+  # select the review that was created by the user (that matches users id in the review)
   stmt = db.select(Review).filter_by(id=user_id)
   reviews = db.session.scalars(stmt).all()
+  # return the reviews to the user
   return ReviewSchema(many=True).dump(reviews)
 
 # Create a review

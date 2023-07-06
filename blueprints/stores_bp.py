@@ -24,7 +24,7 @@ def one_store(store_id):
   else:
     return {'error': 'Store not found'}, 404
 
-# Create a store instance
+# Create a new store instance
 @stores_bp.route('/', methods=['POST'])
 @jwt_required()
 def create_store():
@@ -35,7 +35,13 @@ def create_store():
   store = Store(
     name = store_info['name'],
     phone_number = store_info['phone_number'],
-    owner_id = get_jwt_identity()
+    owner_id = get_jwt_identity(),
+    street_number = store_info['street_number'],
+    street_name = store_info['street_name'],
+    suburb = store_info['suburb'],
+    city = store_info['city'],
+    state = store_info['state'],
+    zip_code = store_info['zip_code']
   )
   # Add and commit the new store to the session
   db.session.add(store)

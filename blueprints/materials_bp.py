@@ -1,7 +1,6 @@
 from flask import Blueprint, request
 from models.material import Material, MaterialSchema
 from blueprints.auth_bp import owner_required
-from models.user import User, UserSchema
 from init import db
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
@@ -33,7 +32,7 @@ def material_one(material_name):
 # Add a new material
 @materials_bp.route('/', methods=['POST'])
 @jwt_required()
-def create_card():
+def create_material():
   owner_required()
   # Load the incoming POST data via the schema
   material_info = MaterialSchema().load(request.json)
@@ -43,7 +42,7 @@ def create_card():
     category = material_info['category'],
     description = material_info['description'],
     price = material_info['price'],
-    owner_id = get_jwt_identity()
+    store_id = material_info['store_id']
   )
   # Add and commit the new card to the session
   db.session.add(material)

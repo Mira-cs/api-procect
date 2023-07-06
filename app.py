@@ -27,5 +27,9 @@ def create_app():
   @app.errorhandler(401)
   def unauthorized(err):
     return {'error': 'You are not authorized to perform this action'}, 401
+  
+  @app.errorhandler(403)
+  def unauthorized(err):
+    return {'error': 'The requested information was not found'}, 403
 
   return app
