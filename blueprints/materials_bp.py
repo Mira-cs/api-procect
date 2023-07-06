@@ -29,29 +29,25 @@ def material_one(material_name):
   else:
     return {'error': 'Material not found'}, 404
   
-# Add a new material
-@materials_bp.route('/', methods=['POST'])
-@jwt_required()
-def create_card():
-  # Load the incoming POST data via the schema
-  materials_info = MaterialSchema().load(request.json)
-  # Create a new Card instance from the card_info
-  material = Material(
-    name = card_info['title'],
-    category = card_info['description'],
-    description = card_info['status'],
-    price = date.today(),
-    user_id = get_jwt_identity()
-  )
-  # Add and commit the new card to the session
-  db.session.add(card)
-  db.session.commit()
-  # Send the new card back to the client
-  return CardSchema().dump(card), 201
+# # Add a new material
+# @materials_bp.route('/', methods=['POST'])
+# @jwt_required()
+# def create_card():
+#   admin_required()
+#   # Load the incoming POST data via the schema
+#   material_info = MaterialSchema().load(request.json)
+#   # Create a new Card instance from the card_info
+#   material = Material(
+#     name = material_info['name'],
+#     category = material_info['category'],
+#     description = material_info['description'],
+#     price = material_info['price'],
+#     owner_id = get_jwt_identity()
+#   )
+#   # Add and commit the new card to the session
+#   db.session.add(material)
+#   db.session.commit()
+#   # Send the new card back to the client
+#   return MaterialSchema().dump(material), 201
 
-def admin_required():
-  user_email = get_jwt_identity()
-  stmt = db.select(User).filter_by(email=user_email)
-  user = db.session.scalar(stmt)
-  if not user.is_store_owner:
-    abort(401)
+

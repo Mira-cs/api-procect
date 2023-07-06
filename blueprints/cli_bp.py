@@ -3,6 +3,7 @@ from models.user import User
 from models.store import Store
 from models.material import Material
 from models.address import Address
+from models.owner import Owner
 from init import db,bcrypt
 
 
@@ -33,16 +34,36 @@ def seed_db():
     User(
     name = 'Mark',
     last_name = 'Johnson',
-    email = 'mark_shop@gmail.com',
+    email = 'mark_johnson@gmail.com',
     password = bcrypt.generate_password_hash('password3').decode('utf-8'),
-    is_store_owner = True
+    )
+  ]
+
+  owners = [
+    Owner(
+    name = 'John',
+    last_name = 'Smith',
+    email = 'john_smith@gmail.com',
+    password = bcrypt.generate_password_hash('password4').decode('utf-8')
+   ), 
+    Owner(
+    name = 'Megan',
+    last_name = 'Murphy',
+    email = 'megan_murphy@gmail.com',
+    password = bcrypt.generate_password_hash('password5').decode('utf-8')
+   ), 
+    Owner(
+    name = 'Mark',
+    last_name = 'Johnson',
+    email = 'mark_johnson@gmail.com',
+    password = bcrypt.generate_password_hash('password6').decode('utf-8'),
     )
   ]
   
   # Truncate the User table (deleting rows of data)
-  db.session.query(User).delete()
+  db.session.query(Owner).delete()
   # Add the card to the session (transaction)
-  db.session.add_all(users)
+  db.session.add_all(owners)
   # Commit the changes to the database
   db.session.commit()
   

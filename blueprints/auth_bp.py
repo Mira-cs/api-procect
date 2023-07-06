@@ -4,6 +4,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from models.user import User
 from init import db,bcrypt
 from models.user import User, UserSchema
+from models.owner import Owner, OwnerSchema
 from flask import request
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta
@@ -11,15 +12,8 @@ from flask_jwt_extended import create_access_token
 
 auth_bp = Blueprint('auth', __name__)
 
-def admin_required():
-  user_email = get_jwt_identity()
-  stmt = db.select(Modelname).filter_by(email=user_email)
-  user = db.session.scalar(stmt)
-  if not (user and user.is_shop_owner):
-    abort(401)  
-
-@auth_bp.route('/register', methods=['POST'])
-def register(): 
+@auth_bp.route('/users/register', methods=['POST'])
+def users_register(): 
   try:
     # to validate and sanitize all the incoming data via Marshmallow schema
     # Parse, sanitize and validate the incoming JSON data
@@ -41,8 +35,8 @@ def register():
   except IntegrityError:
     return {'error': 'Email address already in use'}, 409
   
-@auth_bp.route('/login', methods=['POST'])
-def login():
+@auth_bp.route('/users/login', methods=['POST'])
+def users_login():
   try:
     # to get the user from the database, where email equals to the email from the user data posted
     stmt = db.select(User).filter_by(email=request.json['email'])
@@ -59,5 +53,49 @@ def login():
       return {'error': 'Invalid email address or password'}, 401
   except KeyError:
     return{'error': 'Email and password are required'}, 400
+
+# Owner routes for registering and logging in
+@auth_bp.route('/owners/register', methods=['POST'])
+def owners_register(): 
+  try:
+    owner_info = OwnerSchema().load(request.json)
+    owner = Owner(
+      email=owner_info['email'],
+      password=bcrypt.generate_password_hash(owner_info['password']).decode('utf8'),
+      name=owner_info['name'],
+      last_name=owner_info['last_name'],
+      contact_number=owner_info['contact_number']
+    )
+    db.session.add(owner)
+    db.session.commit()    
+    return OwnerSchema(exclude=['password']).dump(owner), 201
+  except IntegrityError:
+    return {'error': 'Email address already in use'}, 409
   
- 
+@auth_bp.route('/owners/login', methods=['POST'])
+def owners_login():
+  try:
+    stmt = db.select(Owner).filter_by(email=request.json['email'])
+    owner = db.session.scalar(stmt)
+    if owner and bcrypt.check_password_hash(owner.password, request.json['password']):
+      token = create_access_token(identity=owner.email, expires_delta = timedelta(hours=2))
+      return {'token': token, 'owner': OwnerSchema(exclude=['password']).dump(owner)}
+    else:
+      return {'error': 'Invalid email address or password'}, 401
+  except KeyError:
+    return{'error': 'Email and password are required'}, 400
+  
+
+def owner_required():
+  owner_email = get_jwt_identity()
+  stmt = db.select(Owner).filter_by(email=owner_email)
+  owner = db.session.scalar(stmt)
+  if not owner:
+    abort(401)
+    
+def user_required():
+  user_email = get_jwt_identity()
+  stmt = db.select(User).filter_by(email=user_email)
+  user  = db.session.scalar(stmt)
+  if not user:
+    abort(401)
