@@ -1,5 +1,5 @@
 from init import db, ma
-
+from marshmallow import fields
 
 class Store(db.Model):
   __tablename__ = 'stores'
@@ -16,10 +16,11 @@ class Store(db.Model):
   
   owner_id = db.Column(db.Integer, db.ForeignKey('owners.id',ondelete='CASCADE'), nullable=False)
   
-  owner = db.Relationship('Owner', back_populates='stores')
-  materials = db.relationship('Material',back_populates='stores')
+  owner = db.relationship('Owner', back_populates='stores',cascade='all, delete')
+  materials = db.relationship('Material',back_populates='stores',cascade='all, delete')
+  reviews = db.relationship('Review', back_populates='stores',cascade='all, delete')
 
 class StoreSchema(ma.Schema):
   class Meta:
     # listing the fields we want to include 
-    fields = ('name','phone_number','street_number','street_name','suburb', 'city', 'state','zip_code')
+    fields = ('name','suburb', 'city', 'state','id')

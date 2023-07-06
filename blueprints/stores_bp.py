@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from models.store import Store, StoreSchema
-from blueprints.auth_bp import owner_required
+from blueprints.auth_bp import owner_required, owner_required_foraccess
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from init import db
 
@@ -48,3 +48,41 @@ def create_store():
   db.session.commit()
   # Send the new store info back to the client with the success status
   return StoreSchema().dump(store), 201
+
+# update a store information
+@stores_bp.route('/<int:store_id>', methods=['PUT','PATCH'])
+@jwt_required()
+def update_store(store_id):
+  owner_required()
+  stmt = db.select(Store).filter_by(id=store_id)
+  store = db.session.scalar(stmt)
+  store_info = StoreSchema().load(request.json)
+  if store:
+    owner_required_foraccess(store.owner.id)
+    store.name = store_info.get('name',store.name),
+    store.phone_number = store_info.get('phone_number',store.phone_number),
+    store.street_number = store_info.get('street_number',store.street_number ),
+    store.street_name = store_info.get('street_name',store.street_name),
+    store.suburb = store_info.get('suburb',store.suburb),
+    store.city = store_info.get('city',store.city),
+    store.state = store_info.get('state',store.state),
+    store.zip_code = store_info.get('zip_code',store.zip_code)
+    db.session.commit()
+    return StoreSchema().dump(store)
+  else:
+    return {'error': 'Store not found'}, 404
+  
+  # delete a store
+@stores_bp.route('/<int:store_id>', methods=['DELETE'])
+@jwt_required()
+def delete_store(store_id):
+  owner_required()
+  stmt = db.select(Store).filter_by(id=store_id)
+  store = db.session.scalar(stmt)
+  if store:
+    owner_required_foraccess(store.owner.id)
+    db.session.delete(store)
+    db.session.commit()
+    return {}, 200
+  else:
+    return {'error': 'Store not found'}, 404

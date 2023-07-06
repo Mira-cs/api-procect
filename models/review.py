@@ -11,9 +11,11 @@ class Review(db.Model):
   # this table is linked to users table via FK user_id, nullable=false,
   # because a review can't be created without a user
   user_id = db.Column(db.Integer, db.ForeignKey('users.id',ondelete='CASCADE'), nullable=False)
-  user = db.relationship('User', back_populates='reviews')
-  store_id = db.Column(db.Integer, db.ForeignKey('stores.id'), nullable=False)
-  material_id = db.Column(db.Integer, db.ForeignKey('materials.id'), nullable=False)
+  user = db.relationship('User', back_populates='reviews',cascade='all, delete')
+  store_id = db.Column(db.Integer, db.ForeignKey('stores.id',ondelete='CASCADE'), nullable=False)
+  stores = db.relationship('Store', back_populates='reviews',cascade='all, delete')
+  material_id = db.Column(db.Integer, db.ForeignKey('materials.id',ondelete='CASCADE'), nullable=False)
+  materials = db.relationship('Material', back_populates='reviews',cascade='all, delete')
   
 class ReviewSchema(ma.Schema):
   class Meta:
