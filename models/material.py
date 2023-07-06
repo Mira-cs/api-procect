@@ -11,11 +11,12 @@ class Material(db.Model):
   price = db.Column(db.Numeric, nullable=False)
   
   
-  store_id = db.Column(db.Integer, db.ForeignKey('stores.id',ondelete='CASCADE'), nullable=False)
-  stores = db.relationship('Store',back_populates='materials',cascade='all, delete')
-  reviews = db.relationship('Review',back_populates='materials',cascade='all, delete')
+  store_id = db.Column(db.Integer, db.ForeignKey('stores.id', ondelete='CASCADE'), nullable=False)
+  stores = db.relationship('Store',back_populates='materials')
+  reviews = db.relationship('Review',back_populates='material',cascade='all, delete')
   
 class MaterialSchema(ma.Schema):
+  stores = fields.List(fields.Nested('StoreSchema', only=['name','suburb','city']))
   class Meta:
     # listing the fields we want to include 
-    fields = ('id','name','category', 'description','price','store_id')
+    fields = ('id','name','category', 'description','price','stores')

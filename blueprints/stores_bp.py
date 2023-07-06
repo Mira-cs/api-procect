@@ -58,7 +58,7 @@ def update_store(store_id):
   store = db.session.scalar(stmt)
   store_info = StoreSchema().load(request.json)
   if store:
-    owner_required_foraccess(store.owner.id)
+    owner_required_foraccess(store_id)
     store.name = store_info.get('name',store.name),
     store.phone_number = store_info.get('phone_number',store.phone_number),
     store.street_number = store_info.get('street_number',store.street_number ),
@@ -80,7 +80,7 @@ def delete_store(store_id):
   stmt = db.select(Store).filter_by(id=store_id)
   store = db.session.scalar(stmt)
   if store:
-    owner_required_foraccess(store.owner.id)
+    owner_required_foraccess(store_id)
     db.session.delete(store)
     db.session.commit()
     return {}, 200

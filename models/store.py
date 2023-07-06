@@ -14,11 +14,11 @@ class Store(db.Model):
   state = db.Column(db.String(30), nullable=False)
   zip_code = db.Column(db.Integer, nullable=False)
   
-  owner_id = db.Column(db.Integer, db.ForeignKey('owners.id',ondelete='CASCADE'), nullable=False)
+  owner_id = db.Column(db.Integer, db.ForeignKey('owners.id', ondelete='CASCADE'), nullable=False)
   
-  owner = db.relationship('Owner', back_populates='stores',cascade='all, delete')
-  materials = db.relationship('Material',back_populates='stores',cascade='all, delete')
-  reviews = db.relationship('Review', back_populates='stores',cascade='all, delete')
+  owner = db.relationship('Owner', back_populates='stores')
+  materials = db.relationship('Material',back_populates='stores', cascade='all, delete')
+  reviews = db.relationship('Review', back_populates='store',cascade='all, delete')
 
 class StoreSchema(ma.Schema):
   class Meta:
