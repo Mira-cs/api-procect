@@ -10,7 +10,7 @@ class Review(db.Model):
   
   # this table is linked to users table via FK user_id, nullable=false,
   # because a review can't be created without a user
-  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  user_id = db.Column(db.Integer, db.ForeignKey('users.id',ondelete='CASCADE'), nullable=False)
   store_id = db.Column(db.Integer, db.ForeignKey('stores.id'), nullable=False)
   material_id = db.Column(db.Integer, db.ForeignKey('materials.id'), nullable=False)
   

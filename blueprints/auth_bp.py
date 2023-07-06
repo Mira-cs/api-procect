@@ -5,6 +5,7 @@ from models.user import User
 from init import db,bcrypt
 from models.user import User, UserSchema
 from models.owner import Owner, OwnerSchema
+from models.review import Review, ReviewSchema
 from flask import request
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta
@@ -86,16 +87,18 @@ def owners_login():
     return{'error': 'Email and password are required'}, 400
   
 
-def owner_required():
-  owner_email = get_jwt_identity()
-  stmt = db.select(Owner).filter_by(email=owner_email)
-  owner = db.session.scalar(stmt)
-  if not owner:
-    abort(401)
-    
 def user_required():
+  user_id = get_jwt_identity()
+  stmt = db.select(User).filter_by(id=user_id)
+  user = db.session.scalar(stmt)
+  if not user:
+    abort(401, description = 'You must be authorized to access')
+    
+
+# Matching the user id with the user id on the review
+def author_required(author_id):
   user_email = get_jwt_identity()
   stmt = db.select(User).filter_by(email=user_email)
-  user  = db.session.scalar(stmt)
-  if not user:
+  user = db.session.scalar(stmt)
+  if not user.id == author_id:
     abort(401)

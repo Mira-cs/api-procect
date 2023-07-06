@@ -24,6 +24,6 @@ def create_app():
 
   @app.errorhandler(401)
   def unauthorized(err):
-    return {'error': 'You must be an admin'}, 401
+    return {'error': 'You are not authorized to perform this action'}, 401
 
   return app

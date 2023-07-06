@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 from models.material import Material, MaterialSchema
+from blueprints.auth_bp import user_required
 from models.user import User, UserSchema
 from init import db
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity

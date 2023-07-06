@@ -1,5 +1,6 @@
 from flask import Blueprint, request
-from blueprints.auth_bp import user_required
+from blueprints.auth_bp import user_required, author_required
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from models.review import Review, ReviewSchema
 from init import db
 from flask_jwt_extended import jwt_required
@@ -27,3 +28,22 @@ def create_card():
   db.session.commit()
   # Send the new review back to the client
   return ReviewSchema().dump(review), 201
+
+# Update a review
+@reviews_bp.route('/<int:review_id>', methods=['PUT','PATCH'])
+@jwt_required()
+def update_review(review_id):
+  stmt = db.select(Review).filter_by(id=review_id)
+  review = db.session.scalar(stmt)
+  review_info = ReviewSchema().load(request.json)
+  if review:
+    author_required(review.user_id)
+    review.title = review_info.get('title', review.title)
+    review.comment = review_info.get('comment', review.comment)
+    review.rating = review_info.get('rating', review.rating)
+    db.session.commit()
+    return ReviewSchema().dump(review)
+  else:
+    return {'error': 'Review not found'}, 404
+  
+  # Delete a review
