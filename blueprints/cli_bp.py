@@ -4,6 +4,7 @@ from models.store import Store
 from models.material import Material
 from models.address import Address
 from models.owner import Owner
+from models.review import Review
 from init import db,bcrypt
 
 
@@ -39,6 +40,13 @@ def seed_db():
     )
   ]
 
+  # Truncate the User table (deleting rows of data)
+  db.session.query(User).delete()
+  # Add the card to the session (transaction)
+  db.session.add_all(users)
+  # Commit the changes to the database
+  db.session.commit()
+  
   owners = [
     Owner(
     name = 'John',
@@ -142,6 +150,38 @@ def seed_db():
   db.session.add_all(addresses)
   db.session.commit()
 
- 
+  reviews = [
+    Review(
+    title = 'Just Okay',
+    comment = 'Service could have been better, even though the range of the materials was extensive',
+    rating = 3,
+    user_id = users[0].id,
+    store_id = stores[0].id,
+    material_id = materials[0].id
+   ), 
+    Review(
+    title = 'Very happy with the purchase',
+    comment = 'The quality of the granite I got from the store is very good',
+    rating = 5,
+    user_id = users[1].id,
+    store_id = stores[1].id,
+    material_id = materials[1].id
+   ), 
+    Review(
+    title = 'Highly recommend',
+    comment = 'Beautiful marble as well as the quality',
+    rating = 5,
+    user_id = users[2].id,
+    store_id = stores[2].id,
+    material_id = materials[2].id
+    )
+  ]
+  
+  # Truncate the User table (deleting rows of data)
+  db.session.query(Review).delete()
+  # Add the card to the session (transaction)
+  db.session.add_all(reviews)
+  # Commit the changes to the database
+  db.session.commit()
 
   print("Models seeded")
