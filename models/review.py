@@ -6,6 +6,7 @@ class Review(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   title = db.Column(db.String(50))
   comment = db.Column(db.String())
+  date_created = db.Column(db.Date())
   rating = db.Column(db.Integer, nullable=False)
   
   # this table is linked to users table via FK user_id, nullable=false,
@@ -20,4 +21,4 @@ class Review(db.Model):
 class ReviewSchema(ma.Schema):
   class Meta:
     # listing the fields we want to include 
-    fields = ('id','title','comment','rating','user_id','store_id', 'material_id')
+    fields = ('id','title','comment','rating','date_created','user_id','store_id', 'material_id')

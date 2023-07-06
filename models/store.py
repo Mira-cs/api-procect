@@ -17,7 +17,7 @@ class Store(db.Model):
   owner_id = db.Column(db.Integer, db.ForeignKey('owners.id', ondelete='CASCADE'), nullable=False)
   
   owner = db.relationship('Owner', back_populates='stores')
-  materials = db.relationship('Material',back_populates='stores', cascade='all, delete')
+  materials = db.relationship('Material',back_populates='store', cascade='all, delete')
   reviews = db.relationship('Review', back_populates='store',cascade='all, delete')
 
 class StoreSchema(ma.Schema):

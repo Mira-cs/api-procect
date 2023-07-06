@@ -1,5 +1,6 @@
 from init import db, ma
 from marshmallow import fields
+from marshmallow.validate import Length
 
 class Material(db.Model):
   __tablename__ = 'materials'
@@ -12,11 +13,12 @@ class Material(db.Model):
   
   
   store_id = db.Column(db.Integer, db.ForeignKey('stores.id', ondelete='CASCADE'), nullable=False)
-  stores = db.relationship('Store',back_populates='materials')
+  store = db.relationship('Store',back_populates='materials')
   reviews = db.relationship('Review',back_populates='material',cascade='all, delete')
   
 class MaterialSchema(ma.Schema):
-  stores = fields.List(fields.Nested('StoreSchema', only=['name','suburb','city']))
+  store = fields.Nested('StoreSchema', only=['name','suburb','city'] )
+  name = fields.String(required=True, validate=Length(min=5))
   class Meta:
     # listing the fields we want to include 
-    fields = ('id','name','category', 'description','price','stores')
+    fields = ('id','name','category', 'description','price','store')

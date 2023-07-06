@@ -1,6 +1,7 @@
 from flask import Blueprint, request, abort
 from models.material import Material, MaterialSchema
 from models.store import Store, StoreSchema
+from models.owner import Owner, OwnerSchema
 from blueprints.auth_bp import owner_required, owner_required_foraccess
 from init import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -30,6 +31,18 @@ def material_one(material_name):
   else:
     return {'error': 'Material not found'}, 404
   
+@materials_bp.route('/<string:material_name>/<string:location>')
+def material_by_location(material_name,location):
+  stmt = db.select(Material).where(Material.name.ilike(material_name))
+  material = db.session.scalar(stmt)
+  get_store = db.select(Store).where(Store.city.ilike(location))
+  store = db.session.scalar(get_store)
+  # if material is found, return it
+  if material.store_id == store.id:
+      return StoreSchema().dump(store)
+  else:
+    return {'error': 'Material not found'}, 404 
+  
 # Add a new material
 @materials_bp.route('/', methods=['POST'])
 @jwt_required()
@@ -37,7 +50,6 @@ def create_material():
   owner_required()
   # Load the incoming POST data via the schema
   material_info = MaterialSchema().load(request.json)
-  # Create a new Card instance from the card_info
   material = Material(
     name = material_info['name'],
     category = material_info['category'],
@@ -45,10 +57,8 @@ def create_material():
     price = material_info['price'],
     store_id = material_info['store_id']
   )
-  # Add and commit the new card to the session
   db.session.add(material)
   db.session.commit()
-  # Send the new card back to the client
   return MaterialSchema().dump(material), 201
 
 # update a material

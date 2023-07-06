@@ -1,8 +1,9 @@
 from flask import Blueprint, request
 from blueprints.auth_bp import user_required, author_required
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.review import Review, ReviewSchema
 from init import db
+from datetime import date
 from flask_jwt_extended import jwt_required
 
 reviews_bp = Blueprint('reviews', __name__, url_prefix='/reviews')
@@ -32,6 +33,7 @@ def create_review():
     comment = review_info['comment'],
     rating = review_info['rating'],
     user_id = get_jwt_identity(),
+    date_created = date.today(),
     store_id = review_info['store_id'],
     material_id = review_info['material_id']
   )
