@@ -47,3 +47,15 @@ def update_review(review_id):
     return {'error': 'Review not found'}, 404
   
   # Delete a review
+@reviews_bp.route('/<int:review_id>', methods=['DELETE'])
+@jwt_required()
+def delete_review(review_id):
+  stmt = db.select(Review).filter_by(id=review_id)
+  review = db.session.scalar(stmt)
+  if review:
+    author_required(review.user_id)
+    db.session.delete(review)
+    db.session.commit()
+    return {}, 200
+  else:
+    return {'error': 'Card not found'}, 404
