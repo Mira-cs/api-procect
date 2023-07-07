@@ -101,10 +101,8 @@ def author_required(author_id):
   if not user.id == author_id:
     abort(401)
 
-def get_access(materials_id):
-  user_id = get_jwt_identity()
-  stmt = db.select(User).filter_by(id=user_id)
-  user = db.session.scalar(stmt)
-  if materials_id != user.stores.id:
-    abort(401)
+def get_access(store):
+    user_id = get_jwt_identity()
+    if user_id != store.user_id:
+        abort(401)
 

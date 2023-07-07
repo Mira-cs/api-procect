@@ -16,7 +16,7 @@ def all_reviews_by_user():
   # get users id
   user_id = get_jwt_identity()
   # select the review that was created by the user (that matches users id in the review)
-  stmt = db.select(Review).filter_by(id=user_id)
+  stmt = db.select(Review).filter_by(user_id=user_id)
   reviews = db.session.scalars(stmt).all()
   # return the reviews to the user
   return ReviewSchema(many=True).dump(reviews)

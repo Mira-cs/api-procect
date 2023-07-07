@@ -38,10 +38,13 @@ def material_by_location(material_name,location):
   get_store = db.select(Store).where(Store.city.ilike(location))
   store = db.session.scalar(get_store)
   # if material is found, return it
-  if material.store_id == store.id:
-      return StoreSchema().dump(store)
+  if material and store:
+        if material in store.materials:
+            return StoreSchema().dump(store)
+        else:
+            return {'error': 'Material not found in the specified store'}, 404
   else:
-    return {'error': 'Material not found'}, 404 
+      return {'error': 'Material or store not found'}, 404
   
 # Add a new material
 @materials_bp.route('/', methods=['POST'])
