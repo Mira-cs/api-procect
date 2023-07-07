@@ -30,7 +30,6 @@ class StoreSchema(ma.Schema):
   city = fields.String(required=True, validate=And(Length(min=5), Regexp('^[a-zA-Z ]+$', error='Only letters and spaces are allowed')))
   state = fields.String(required=True, validate=And(Length(min=5), Regexp('^[a-zA-Z ]+$', error='Only letters and spaces are allowed')))
   zip_code = fields.Integer(required=True)
-  reviews = fields.List(fields.Nested('ReviewSchema', exclude=['review_id']))
+  reviews = fields.List(fields.Nested('ReviewSchema'))
   class Meta:
-    # listing the fields we want to include 
     fields = ('name','suburb', 'city', 'state','id','zip_code','street_name', 'street_number','phone_number','reviews')

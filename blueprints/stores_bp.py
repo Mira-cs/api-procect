@@ -1,6 +1,6 @@
 from flask import Blueprint, request, abort
 from models.store import Store, StoreSchema
-from models.user import User, UserSchema
+from models.user import User
 from blueprints.auth_bp import owner_required
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from blueprints.auth_bp import owner_required,get_access
@@ -8,15 +8,16 @@ from init import db
 
 stores_bp = Blueprint('stores', __name__, url_prefix='/stores')
 
-# Return all Stores available
+# Return all Stores available in the db
 @stores_bp.route('/')
 def all_stores():
   # select * from stores;
   stmt = db.select(Store).order_by(Store.name.asc())
   # storing the result in the stores variable (many)
   stores = db.session.scalars(stmt).all()
+  # returning all the available stores
   return StoreSchema(many=True).dump(stores)
-
+# route to return one store based on its id
 @stores_bp.route('/<int:store_id>')
 def one_store(store_id):
   stmt = db.select(Store).filter_by(id=store_id)
@@ -26,7 +27,7 @@ def one_store(store_id):
   else:
     return {'error': 'Store not found'}, 404
 
-# Create a new store instance
+# Create a new store instance in the database
 @stores_bp.route('/', methods=['POST'])
 @jwt_required()
 def create_store():
@@ -56,13 +57,14 @@ def create_store():
   else:
     abort(401)
     
-# update a store information
+# PUT/PATCH, Update a store information
 @stores_bp.route('/<int:store_id>', methods=['PUT','PATCH'])
 @jwt_required()
 def update_store(store_id):
   stmt = db.select(Store).filter_by(id=store_id)
   store = db.session.scalar(stmt)
   store_info = StoreSchema().load(request.json)
+  # if store exists
   if store:   
     get_access(store)
     store.name = store_info.get('name',store.name),

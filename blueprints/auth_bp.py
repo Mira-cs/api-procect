@@ -52,38 +52,6 @@ def users_login():
   except KeyError:
     return{'error': 'Email and password are required'}, 400
 
-# Owner routes for registering and logging in
-# @auth_bp.route('/owners/register', methods=['POST'])
-# def owners_register(): 
-#   try:
-#     owner_info = OwnerSchema().load(request.json)
-#     owner = Owner(
-#       email=owner_info['email'],
-#       password=bcrypt.generate_password_hash(owner_info['password']).decode('utf8'),
-#       name=owner_info['name'],
-#       last_name=owner_info['last_name'],
-#       contact_number=owner_info['contact_number']
-#     )
-#     db.session.add(owner)
-#     db.session.commit()    
-#     return OwnerSchema(exclude=['password']).dump(owner), 201
-#   except IntegrityError:
-#     return {'error': 'Email address already in use'}, 409
-  
-# @auth_bp.route('/owners/login', methods=['POST'])
-# def owners_login():
-#   try:
-#     stmt = db.select(Owner).filter_by(email=request.json['email'])
-#     owner = db.session.scalar(stmt)
-#     if owner and bcrypt.check_password_hash(owner.password, request.json['password']):
-#       token = create_access_token(identity=owner.id, expires_delta = timedelta(hours=2))
-#       return {'token': token, 'owner': OwnerSchema(exclude=['password']).dump(owner)}
-#     else:
-#       return {'error': 'Invalid email address or password'}, 401
-#   except KeyError:
-#     return{'error': 'Email and password are required'}, 400
-  
-
 
 def owner_required():
   user_id = get_jwt_identity()
@@ -101,8 +69,10 @@ def author_required(author_id):
   if not user.id == author_id:
     abort(401)
 
-def get_access(store):
-    user_id = get_jwt_identity()
-    if user_id != store.user_id:
-        abort(401)
+def get_access(stores):
+  user_id = get_jwt_identity()
+  stmt = db.select(User).filter_by(id=user_id)
+  user = db.session.scalar(stmt)
+  if not user.is_owner and stores != user.store.id:
+    abort(401)
 

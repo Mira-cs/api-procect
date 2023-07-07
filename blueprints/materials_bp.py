@@ -2,7 +2,7 @@ from flask import Blueprint, request,abort
 from models.material import Material, MaterialSchema
 from models.store import Store, StoreSchema
 from models.user import User
-from blueprints.auth_bp import owner_required,get_access
+from blueprints.auth_bp import owner_required
 from init import db
 from flask_jwt_extended import jwt_required,get_jwt_identity
 
@@ -89,13 +89,20 @@ def update_material(material_id):
 @materials_bp.route('/<int:material_id>', methods=['DELETE'])
 @jwt_required()
 def delete_material(material_id):
-  owner_required()
-  stmt = db.select(Material).filter_by(id=material_id)
-  material = db.session.scalar(stmt)
-  if material:
-    get_access(material.store_id)
+    material = Material.query.get(material_id)   
+    if not material:
+      return {'error': 'Material not found'}, 404   
+    user_id = get_jwt_identity()
+    if material.user_id != user_id:
+      return {'error': 'Unauthorized'}, 401   
     db.session.delete(material)
-    db.session.commit()
+    db.session.commit()   
     return {'Message': 'Material was successfully deleted'}, 200
-  else:
-    return {'error': 'Material not found'}, 404
+
+
+
+
+
+
+
+

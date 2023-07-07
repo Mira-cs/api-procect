@@ -49,7 +49,7 @@ def create_review():
     else:
       abort(401, description='Unauthorized to create a review')
   except KeyError:
-    return {'error':'Title, Comment and Rating are required fields'}
+    return {'error':'Title, Comment, Rating, Material ID and Store ID are required fields'}
 
 # Update a review
 @reviews_bp.route('/<int:review_id>', methods=['PUT','PATCH'])
