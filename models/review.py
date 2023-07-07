@@ -1,5 +1,6 @@
 from init import db, ma
-from marshmallow.validate import fields, Length, OneOf, Regexp, And
+from marshmallow.validate import  Length, Regexp, And
+from marshmallow import fields
 
 class Review(db.Model):
   __tablename__ = 'reviews'
@@ -20,8 +21,8 @@ class Review(db.Model):
   material = db.relationship('Material', back_populates='reviews')
   
 class ReviewSchema(ma.Schema):
-  title = fields.String(required=True, validate=And(Length(min=10), Regexp('^[a-zA-Z0-9 ]+$', error='Only letters, numbers and spaces are allowed')))
-  comment = fields.String(required=True, validate=Length(min=50))
+  title = fields.String(required=True, validate=And(Length(min=7), Regexp('^[a-zA-Z0-9 ]+$', error='Only letters, numbers and spaces are allowed')))
+  comment = fields.String(required=True, validate=Length(min=10))
   rating = fields.Integer(required=True)
   class Meta:
     # listing the fields we want to include 

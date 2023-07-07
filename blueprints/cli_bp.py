@@ -2,7 +2,6 @@ from flask import Blueprint
 from models.user import User
 from models.store import Store
 from models.material import Material
-from models.owner import Owner
 from models.review import Review
 from init import db,bcrypt
 
@@ -29,56 +28,35 @@ def seed_db():
     name = 'Caroline',
     last_name = 'Neally',
     email = 'caroline_oneal@gmail.com',
-    password = bcrypt.generate_password_hash('password2').decode('utf-8')
+    password = bcrypt.generate_password_hash('password2').decode('utf-8'),
+    is_owner = True
    ), 
     User(
     name = 'Mark',
     last_name = 'Johnson',
     email = 'mark_johnson@gmail.com',
-    password = bcrypt.generate_password_hash('password3').decode('utf-8')
-    )
-  ]
-
-  # Truncate the User table (deleting rows of data)
-  db.session.query(User).delete()
-  # Add the card to the session (transaction)
-  db.session.add_all(users)
-  # Commit the changes to the database
-  db.session.commit()
-  
-  owners = [
-    Owner(
+    password = bcrypt.generate_password_hash('password3').decode('utf-8'),
+    is_owner = True
+    ),
+    User(
     name = 'John',
     last_name = 'Smith',
     email = 'john_smith@gmail.com',
     password = bcrypt.generate_password_hash('password4').decode('utf-8')
-   ), 
-    Owner(
-    name = 'Megan',
-    last_name = 'Murphy',
-    email = 'megan_murphy@gmail.com',
-    password = bcrypt.generate_password_hash('password5').decode('utf-8')
-   ), 
-    Owner(
-    name = 'Mark',
-    last_name = 'Johnson',
-    email = 'mark_johnson@gmail.com',
-    password = bcrypt.generate_password_hash('password6').decode('utf-8')
-    )
+    
+   )
   ]
-  
-  # Truncate the User table (deleting rows of data)
-  db.session.query(Owner).delete()
-  # Add the card to the session (transaction)
-  db.session.add_all(owners)
-  # Commit the changes to the database
+
+  db.session.query(User).delete()
+  db.session.add_all(users)
   db.session.commit()
   
+
   stores = [
     Store(
     name = 'Home Depot',
     phone_number = '91238410',
-    owner_id = owners[0].id,
+    user_id = users[2].id,
     street_number = 15,
     street_name = 'Jackson Street',
     suburb = 'Merrylands',
@@ -89,7 +67,7 @@ def seed_db():
     Store(
     name = 'Supplies Inc',
     phone_number = '54098123',
-    owner_id = owners[1].id,
+    user_id = users[1].id,
     street_number = 9,
     street_name = 'Grand Street',
     suburb = 'Roscoe',
@@ -100,7 +78,7 @@ def seed_db():
     Store(
     name = 'Everything you need',
     phone_number = '10235392',
-    owner_id = owners[2].id,
+    user_id = users[2].id,
     street_number = 3,
     street_name = 'Monroe Street',
     suburb = 'Madeup',
@@ -155,7 +133,7 @@ def seed_db():
     title = 'Very happy with the purchase',
     comment = 'The quality of the granite I got from the store is very good',
     rating = 5,
-    user_id = users[1].id,
+    user_id = users[0].id,
     store_id = stores[1].id,
     material_id = materials[1].id
    ), 
@@ -163,17 +141,15 @@ def seed_db():
     title = 'Highly recommend',
     comment = 'Beautiful marble as well as the quality',
     rating = 5,
-    user_id = users[2].id,
+    user_id = users[3].id,
     store_id = stores[2].id,
     material_id = materials[2].id
     )
   ]
   
-  # Truncate the User table (deleting rows of data)
+
   db.session.query(Review).delete()
-  # Add the card to the session (transaction)
   db.session.add_all(reviews)
-  # Commit the changes to the database
   db.session.commit()
 
   print("Models seeded")

@@ -1,10 +1,10 @@
-from flask import Blueprint, request, abort
+from flask import Blueprint, request,abort
 from models.material import Material, MaterialSchema
 from models.store import Store, StoreSchema
-from models.owner import Owner, OwnerSchema
-from blueprints.auth_bp import owner_required, owner_required_foraccess
+from models.user import User
+from blueprints.auth_bp import owner_required,get_access
 from init import db
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required,get_jwt_identity
 
 
 
@@ -47,15 +47,18 @@ def material_by_location(material_name,location):
 @materials_bp.route('/', methods=['POST'])
 @jwt_required()
 def create_material():
-  owner_required()
-  # Load the incoming POST data via the schema
+  owner_id = get_jwt_identity()
+  stmt = db.select(User).filter_by(id=owner_id)
+  owner = db.session.scalar(stmt)
+  if not owner.is_owner:
+    abort(401)
   material_info = MaterialSchema().load(request.json)
   material = Material(
-  name = material_info['name'],
-  category = material_info['category'],
-  description = material_info['description'],
-  price = material_info['price'],
-  store_id = material_info['store_id']
+  name=material_info['name'],
+  category=material_info['category'],
+  description=material_info['description'],
+  price=material_info['price'],
+  store_id=material_info['store_id']
   )
   db.session.add(material)
   db.session.commit()
@@ -66,12 +69,11 @@ def create_material():
 @materials_bp.route('/<int:material_id>', methods=['PUT','PATCH'])
 @jwt_required()
 def update_material(material_id):
-  owner_required()
   stmt = db.select(Material).filter_by(id=material_id)
   material_object = db.session.scalar(stmt)
   material_new = MaterialSchema().load(request.json)
   if material_object:
-    owner_required_foraccess(material_object.store_id)
+    owner_required()
     material_object.name = material_new.get('name', material_object.name)
     material_object.category = material_new.get('category', material_object.category)
     material_object.description = material_new.get('description', material_object.description)
@@ -88,7 +90,7 @@ def delete_material(material_id):
   stmt = db.select(Material).filter_by(id=material_id)
   material = db.session.scalar(stmt)
   if material:
-    owner_required_foraccess(material.store_id)
+    get_access(material.store_id)
     db.session.delete(material)
     db.session.commit()
     return {'Message': 'Material was successfully deleted'}, 200
