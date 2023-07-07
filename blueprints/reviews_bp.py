@@ -2,7 +2,7 @@ from flask import Blueprint, request, abort
 from blueprints.auth_bp import author_required
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.review import Review, ReviewSchema
-from models.user import User, UserSchema
+from models.user import User
 from init import db
 from datetime import date
 from flask_jwt_extended import jwt_required

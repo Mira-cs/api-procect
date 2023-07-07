@@ -89,15 +89,18 @@ def update_material(material_id):
 @materials_bp.route('/<int:material_id>', methods=['DELETE'])
 @jwt_required()
 def delete_material(material_id):
-    material = Material.query.get(material_id)   
-    if not material:
-      return {'error': 'Material not found'}, 404   
-    user_id = get_jwt_identity()
-    if material.user_id != user_id:
-      return {'error': 'Unauthorized'}, 401   
-    db.session.delete(material)
-    db.session.commit()   
-    return {'Message': 'Material was successfully deleted'}, 200
+  stmt = db.select(Material).filter_by(id=material_id)
+  material_object = db.session.scalar(stmt)
+  if not material_object:
+    return {'error': 'Material not found'}, 404   
+  user_id = get_jwt_identity()
+  stmt = db.select(User).filter_by(id=user_id)
+  user_object = db.session.scalar(stmt)
+  if user_object.is_owner:
+    return {'Message': 'Material was successfully deleted'}, 200  
+  db.session.delete(material_object)
+  db.session.commit()   
+  return {'error': 'Unauthorized'}, 401 
 
 
 
